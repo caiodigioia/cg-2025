@@ -44,7 +44,7 @@ void desenharMonitor() {
     // Cor da tela
     glColor3f(0.0f, 0.0f, 0.0f);
     glPushMatrix();
-        glTranslatef(0.0, 1.4, 0.0);
+        glTranslatef(0.0, 1.55, 0.0);
         glScalef(1.0, 0.6, 0.05);
         glutSolidCube(1.0);
     glPopMatrix();
@@ -52,7 +52,7 @@ void desenharMonitor() {
     // Cor do suporte
     glColor3f(0.3f, 0.3f, 0.3f);
     glPushMatrix();
-        glTranslatef(0.0, 1.15, -0.5);
+        glTranslatef(0.0, 1.15, -0.08);
         glScalef(0.1, 0.3, 0.1);
         glutSolidCube(1.0);
     glPopMatrix();
@@ -64,7 +64,7 @@ void desenharTeclado() {
     glPushMatrix();
         // Centralizado no eixo X, perto da borda da frente da mesa (Z positivo maior)
         // Dimensões mais finas para parecer teclado
-        glTranslatef(0.15, 1.15, 0.7); 
+        glTranslatef(0.15, 1.1, 0.7); 
         glScalef(0.8, 0.05, 0.4);
         glutSolidCube(1.0);
     glPopMatrix();
@@ -75,8 +75,8 @@ void desenharMouse() {
     glColor3f(0.3f, 0.3f, 0.3f);
     glPushMatrix();
         // Um pouco para a direita do teclado
-        glTranslatef(0.9, 1.0, 0.75);
-        glScalef(0.15, 0.35, 0.1);
+        glTranslatef(0.9, 1.1, 0.75);
+        glScalef(0.15, 0.1, 0.1);
         glutSolidCube(1.0);
     glPopMatrix();
 }
