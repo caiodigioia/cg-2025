@@ -1,14 +1,9 @@
-#define GL_SILENCE_DEPRECATION
-#include <GLUT/glut.h>
+#include <GL/glut.h>
 #include <iostream>
-
-void init() {
-    glClearColor(0.8, 0.8, 0.8, 1.0); // Cor de fundo (cinza claro)
-    glEnable(GL_DEPTH_TEST);          // Ativar profundidade
-}
+GLfloat angle, fAspect, largura, altura, xcamera, ycamera, zcamera;
 
 void desenharMesa() {
-    // Cor do tampo da mesa (marrom claro)
+    // Cor do tampo da mesa
     glColor3f(0.6f, 0.3f, 0.0f);
     glPushMatrix();
         glTranslatef(0.0, 1.0, 0.0);
@@ -16,7 +11,7 @@ void desenharMesa() {
         glutSolidCube(1.0);
     glPopMatrix();
 
-    // Cor das pernas (marrom escuro)
+    // Cor das pernas
     glColor3f(0.4f, 0.2f, 0.0f);
     float pernaAltura = 1.0;
     float pernaX = 1.3;
@@ -34,7 +29,7 @@ void desenharMesa() {
 }
 
 void desenharCPU() {
-    // Cor do gabinete (cinza escuro)
+    // Cor do gabinete
     glColor3f(0.2f, 0.2f, 0.2f);
     glPushMatrix();
         float alturaMesa = 1.0;
@@ -46,7 +41,7 @@ void desenharCPU() {
 }
 
 void desenharMonitor() {
-    // Cor da tela (preta)
+    // Cor da tela
     glColor3f(0.0f, 0.0f, 0.0f);
     glPushMatrix();
         glTranslatef(0.0, 1.4, 0.0);
@@ -54,7 +49,7 @@ void desenharMonitor() {
         glutSolidCube(1.0);
     glPopMatrix();
 
-    // Cor do suporte (cinza)
+    // Cor do suporte
     glColor3f(0.3f, 0.3f, 0.3f);
     glPushMatrix();
         glTranslatef(0.0, 1.15, -0.5);
@@ -64,7 +59,7 @@ void desenharMonitor() {
 }
 
 void desenharTeclado() {
-    // Cor do teclado (cinza claro)
+    // Cor do teclado
     glColor3f(0.7f, 0.7f, 0.7f);
     glPushMatrix();
         // Centralizado no eixo X, perto da borda da frente da mesa (Z positivo maior)
@@ -86,13 +81,13 @@ void desenharMouse() {
     glPopMatrix();
 }
 
+void Desenha() {
 
-
-void display() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-    gluLookAt(5.0, 4.0, 5.0,
+    gluLookAt(xcamera, ycamera, zcamera,
               0.0, 1.0, 0.0,
               0.0, 1.0, 0.0);
 
@@ -105,31 +100,138 @@ void display() {
     glutSwapBuffers();
 }
 
-void reshape(int w, int h) {
-    if (h == 0) h = 1;
-    float aspect = (float)w / (float)h;
+void Inicializa(void) {
 
-    glViewport(0, 0, w, h);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f); 
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
+    glEnable(GL_DEPTH_TEST);   //ativa o zBuffer
 
-    gluPerspective(45.0, aspect, 1.0, 100.0);
+    angle = 45;
+}
 
-    glMatrixMode(GL_MODELVIEW);
+// Função usada para especificar o volume de visualização
+void EspecificaParametrosVisualizacao(void)
+{
+	// Especifica sistema de coordenadas de projeção
+	glMatrixMode(GL_PROJECTION);
+	// Inicializa sistema de coordenadas de projeção
+	glLoadIdentity();
+	// Especifica a projeção perspectiva
+	gluPerspective(angle, fAspect, 0.1, 1000);
+
+	// Especifica sistema de coordenadas do modelo
+	glMatrixMode(GL_MODELVIEW);
+	// Inicializa sistema de coordenadas do modelo
+	glLoadIdentity();
+
+	// Especifica posição do observador e do alvo
+	gluLookAt(xcamera, ycamera, zcamera,  // posição da câmera
+              0, 0, 0,          // posição do alvo
+              0, 1, 0);         // vetor UP da câmera
+}
+
+// Função callback chamada quando o tamanho da janela é alterado 
+void AlteraTamanhoJanela(GLint largura, GLint altura)
+{
+	// Para previnir uma divisão por zero
+	if (altura == 0) altura = 1;
+
+	// Especifica o tamanho da viewport
+	glViewport(0, 0, largura, altura);
+
+	// Calcula a correção de aspecto
+	fAspect = (GLfloat)largura / (GLfloat)altura;
+
+	EspecificaParametrosVisualizacao();
+}
+
+// Função callback chamada para gerenciar teclas especiais
+void TeclasEspeciais(int key, int x, int y)
+{
+	if (key == GLUT_KEY_UP) {
+		ycamera += 0.5;  
+	}
+	if (key == GLUT_KEY_DOWN) {
+		ycamera -= 0.5;  
+	}
+	/*
+	if (key == GLUT_KEY_RIGHT) {
+		 
+	}
+	if (key == GLUT_KEY_LEFT) {
+		  
+	}
+	*/
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);   //aplica o zBuffer  
+    EspecificaParametrosVisualizacao();
+	glutPostRedisplay();
+}
+
+// Função callback chamada para gerenciar teclado
+void GerenciaTeclado(unsigned char key, int x, int y) {
+	switch (key) {
+		case ' ': // restaura posição inicial da camera
+			ycamera = 2;
+            xcamera = 2;
+            zcamera = 10;
+			break;
+		case 'w':
+            zcamera += -0.5;
+            break;
+        case 's':
+            zcamera -= -0.5;
+            break;
+        case 'a':
+            xcamera -= 0.5;
+            break;
+        case 'd':
+            xcamera += 0.5;
+            break;
+	}
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);   //aplica o zBuffer  
+    EspecificaParametrosVisualizacao();
+	glutPostRedisplay();
+}
+
+void GerenciaMouse(int button, int state, int x, int y)
+{
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+	
+	}
+	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN){
+	
+	}
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);   //aplica o zBuffer  
+    EspecificaParametrosVisualizacao();
+	glutPostRedisplay();
 }
 
 int main(int argc, char** argv) {
+
     glutInit(&argc, argv);
+
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(800, 600);
+
+    largura = 500;
+    altura = 500;
+    glutInitWindowSize(largura, altura);
+    fAspect = (GLfloat)largura / (GLfloat)altura;
+
+    xcamera = 2;
+    ycamera = 2;
+    zcamera = 10;
+    
+    angle = 45;
     glutCreateWindow("Cena 3D - Mesa, CPU, Monitor, Teclado e Mouse");
 
-    init();
+    glutDisplayFunc(Desenha);
+    glutReshapeFunc(AlteraTamanhoJanela);
+    glutMouseFunc(GerenciaMouse);
+    glutKeyboardFunc(GerenciaTeclado);
+    glutSpecialFunc(TeclasEspeciais);
 
-    glutDisplayFunc(display);
-    glutReshapeFunc(reshape);
-
+    Inicializa();
     glutMainLoop();
 
     return 0;
