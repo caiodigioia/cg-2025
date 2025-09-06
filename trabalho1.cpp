@@ -13,19 +13,32 @@ void desenharMesa() {
 
     // Cor das pernas
     glColor3f(0.4f, 0.2f, 0.0f);
-    float pernaAltura = 1.0;
     float pernaX = 1.3;
     float pernaZ = 0.8;
 
-    for (int i = -1; i <= 1; i += 2) {
-        for (int j = -1; j <= 1; j += 2) {
-            glPushMatrix();
-                glTranslatef(i * pernaX, pernaAltura / 2.0, j * pernaZ);
-                glScalef(0.1, pernaAltura, 0.1);
-                glutSolidCube(1.0);
-            glPopMatrix();
-        }
-    }
+    glPushMatrix();
+        glTranslatef(-1.3, 0.5, -0.8);
+        glScalef(0.1, 1.0, 0.1);
+        glutSolidCube(1.0);
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslatef(-1.3, 0.5, 0.8);
+        glScalef(0.1, 1.0, 0.1);
+        glutSolidCube(1.0);
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslatef(1.3, 0.5, -0.8);
+        glScalef(0.1, 1.0, 0.1);
+        glutSolidCube(1.0);
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslatef(1.3, 0.5, 0.8);
+        glScalef(0.1, 1.0, 0.1);
+        glutSolidCube(1.0);
+    glPopMatrix();
 }
 
 void desenharCPU() {
