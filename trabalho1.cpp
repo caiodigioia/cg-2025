@@ -6,37 +6,37 @@ void desenharMesa() {
     // Cor do tampo da mesa
     glColor3f(0.6f, 0.3f, 0.0f);
     glPushMatrix();
-        glTranslatef(0.0, 1.0, 0.0);
-        glScalef(3.0, 0.2, 2.0);
+        glTranslatef(0.0, 0.0, 1.0);
+        glScalef(2.0, 3.0, 0.2);
         glutSolidCube(1.0);
     glPopMatrix();
 
     // Cor das pernas
     glColor3f(0.4f, 0.2f, 0.0f);
-    float pernaX = 1.3;
-    float pernaZ = 0.8;
+    float pernaX = 0.8;
+    float pernaY = 1.3;
 
     glPushMatrix();
-        glTranslatef(-1.3, 0.5, -0.8);
-        glScalef(0.1, 1.0, 0.1);
+        glTranslatef(-0.8, -1.3, 0.5);
+        glScalef(0.1, 0.1, 1.0);
         glutSolidCube(1.0);
     glPopMatrix();
 
     glPushMatrix();
-        glTranslatef(-1.3, 0.5, 0.8);
-        glScalef(0.1, 1.0, 0.1);
+        glTranslatef(0.8, -1.3, 0.5);
+        glScalef(0.1, 0.1, 1.0);
         glutSolidCube(1.0);
     glPopMatrix();
 
     glPushMatrix();
-        glTranslatef(1.3, 0.5, -0.8);
-        glScalef(0.1, 1.0, 0.1);
+        glTranslatef(-0.8, 1.3, 0.5);
+        glScalef(0.1, 0.1, 1.0);
         glutSolidCube(1.0);
     glPopMatrix();
 
     glPushMatrix();
-        glTranslatef(1.3, 0.5, 0.8);
-        glScalef(0.1, 1.0, 0.1);
+        glTranslatef(0.8, 1.3, 0.5);
+        glScalef(0.1, 0.1, 1.0);
         glutSolidCube(1.0);
     glPopMatrix();
 }
@@ -47,8 +47,8 @@ void desenharCPU() {
     glPushMatrix();
         float alturaMesa = 1.0;
         float alturaGabinete = 0.7;
-        glTranslatef(1.2, alturaMesa + alturaGabinete / 2.0, 0.0); 
-        glScalef(0.5, alturaGabinete, 0.8);
+        glTranslatef(0.0, 1.2, alturaMesa + alturaGabinete / 2.0); 
+        glScalef(0.8, 0.5, alturaGabinete);
         glutSolidCube(1.0);
     glPopMatrix();
 }
@@ -57,16 +57,16 @@ void desenharMonitor() {
     // Cor da tela
     glColor3f(0.0f, 0.0f, 0.0f);
     glPushMatrix();
-        glTranslatef(0.0, 1.55, 0.0);
-        glScalef(1.0, 0.6, 0.05);
+        glTranslatef(0.0, 0.0, 1.55);
+        glScalef(0.05, 1.0, 0.6);
         glutSolidCube(1.0);
     glPopMatrix();
 
     // Cor do suporte
     glColor3f(0.3f, 0.3f, 0.3f);
     glPushMatrix();
-        glTranslatef(0.0, 1.15, -0.08);
-        glScalef(0.1, 0.3, 0.1);
+        glTranslatef(-0.08, 0.0, 1.3);
+        glScalef(0.1, 0.1, 0.5);
         glutSolidCube(1.0);
     glPopMatrix();
 }
@@ -77,8 +77,8 @@ void desenharTeclado() {
     glPushMatrix();
         // Centralizado no eixo X, perto da borda da frente da mesa (Z positivo maior)
         // Dimensões mais finas para parecer teclado
-        glTranslatef(0.15, 1.1, 0.7); 
-        glScalef(0.8, 0.05, 0.4);
+        glTranslatef(0.7, 0.15, 1.1); 
+        glScalef(0.4, 0.8, 0.05);
         glutSolidCube(1.0);
     glPopMatrix();
 }
@@ -88,8 +88,8 @@ void desenharMouse() {
     glColor3f(0.3f, 0.3f, 0.3f);
     glPushMatrix();
         // Um pouco para a direita do teclado
-        glTranslatef(0.9, 1.1, 0.75);
-        glScalef(0.15, 0.1, 0.1);
+        glTranslatef(0.75, 0.9, 1.1);
+        glScalef(0.1, 0.15, 0.1);
         glutSolidCube(1.0);
     glPopMatrix();
 }
@@ -101,8 +101,8 @@ void Desenha() {
     glLoadIdentity();
 
     gluLookAt(xcamera, ycamera, zcamera,
-              0.0, 1.0, 0.0,
-              0.0, 1.0, 0.0);
+              0.0, 0.0, 1.0,
+              0.0, 0.0, 1.0);
 
     desenharMesa();
     desenharCPU();
@@ -162,10 +162,10 @@ void AlteraTamanhoJanela(GLint largura, GLint altura)
 void TeclasEspeciais(int key, int x, int y)
 {
 	if (key == GLUT_KEY_UP) {
-		ycamera += 0.5;  
+		zcamera += 0.5;  
 	}
 	if (key == GLUT_KEY_DOWN) {
-		ycamera -= 0.5;  
+		zcamera -= 0.5;  
 	}
 	/*
 	if (key == GLUT_KEY_RIGHT) {
@@ -184,21 +184,25 @@ void TeclasEspeciais(int key, int x, int y)
 void GerenciaTeclado(unsigned char key, int x, int y) {
 	switch (key) {
 		case ' ': // restaura posição inicial da camera
-			ycamera = 2;
-            xcamera = 2;
-            zcamera = 10;
+            xcamera = 10;
+            ycamera = 2;
+			zcamera = 2;
 			break;
 		case 'w':
-            zcamera += -0.5;
+        case 'W':
+            xcamera += -0.5;
             break;
         case 's':
-            zcamera -= -0.5;
+        case 'S':
+            xcamera -= -0.5;
             break;
         case 'a':
-            xcamera -= 0.5;
+        case 'A':
+            ycamera -= 0.5;
             break;
         case 'd':
-            xcamera += 0.5;
+        case 'D':
+            ycamera += 0.5;
             break;
 	}
 
@@ -231,9 +235,9 @@ int main(int argc, char** argv) {
     glutInitWindowSize(largura, altura);
     fAspect = (GLfloat)largura / (GLfloat)altura;
 
-    xcamera = 2;
+    xcamera = 10;
     ycamera = 2;
-    zcamera = 10;
+    zcamera = 2;
     
     angle = 45;
     glutCreateWindow("Cena 3D - Mesa, CPU, Monitor, Teclado e Mouse");
