@@ -1,7 +1,7 @@
-#include <GL/glut.h>
+#include <GLUT/glut.h>
 #include <iostream>
 GLfloat angle, fAspect, largura, altura, xcamera, ycamera, zcamera;
-
+GLfloat ajusteMonitor = 0;
 void desenharMesa() {
     // Cor do tampo da mesa
     glColor3f(0.6f, 0.3f, 0.0f);
@@ -58,7 +58,7 @@ void desenharMonitor() {
     glColor3f(0.0f, 0.0f, 0.0f);
     glPushMatrix();
         glTranslatef(0.0, 0.0, 1.55);
-        glScalef(0.05, 1.0, 0.6);
+        glScalef(0.05, 1.0 + ajusteMonitor, 0.6);
         glutSolidCube(1.0);
     glPopMatrix();
 
@@ -77,7 +77,7 @@ void desenharTeclado() {
     glPushMatrix();
         // Centralizado no eixo X, perto da borda da frente da mesa (Z positivo maior)
         // Dimensões mais finas para parecer teclado
-        glTranslatef(0.7, 0.15, 1.1); 
+        glTranslatef(0.7, 0, 1.1); 
         glScalef(0.4, 0.8, 0.05);
         glutSolidCube(1.0);
     glPopMatrix();
@@ -88,7 +88,7 @@ void desenharMouse() {
     glColor3f(0.3f, 0.3f, 0.3f);
     glPushMatrix();
         // Um pouco para a direita do teclado
-        glTranslatef(0.75, 0.9, 1.1);
+        glTranslatef(0.75, 0.6, 1.1);
         glScalef(0.1, 0.15, 0.1);
         glutSolidCube(1.0);
     glPopMatrix();
@@ -203,6 +203,19 @@ void GerenciaTeclado(unsigned char key, int x, int y) {
         case 'd':
         case 'D':
             ycamera += 0.5;
+            break;
+
+        // monitor
+        case '+':
+            if (ajusteMonitor < 0.8) {
+                ajusteMonitor += 0.1;
+            }
+            break;
+
+        case '-':
+            if (ajusteMonitor > -0.2) {
+                ajusteMonitor -= 0.1;
+            }
             break;
 	}
 
