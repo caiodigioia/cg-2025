@@ -3,9 +3,11 @@
 GLfloat angle, fAspect, largura, altura, xcamera, ycamera, zcamera;
 GLfloat ajusteMonitor = 0;
 bool ledAceso = true;
+GLfloat alturaMesa = 1.0;
+GLfloat alturaGabinete = 0.7;
 
 void desenharMesa() {
-    // Cor do tampo da mesa
+    // Tampo da mesa
     glColor3f(0.6f, 0.3f, 0.0f);
     glPushMatrix();
         glTranslatef(0.0, 0.0, 1.0);
@@ -13,7 +15,7 @@ void desenharMesa() {
         glutSolidCube(1.0);
     glPopMatrix();
 
-    // Cor das pernas
+    // Pernas da mesa
     glColor3f(0.4f, 0.2f, 0.0f);
     float pernaX = 0.8;
     float pernaY = 1.3;
@@ -44,11 +46,8 @@ void desenharMesa() {
 }
 
 void desenharCPU() {
-    // Cor do gabinete
     glColor3f(0.2f, 0.2f, 0.2f);
     glPushMatrix();
-        float alturaMesa = 1.0;
-        float alturaGabinete = 0.7;
         glTranslatef(0.0, 1.2, alturaMesa + alturaGabinete / 2.0); 
         glScalef(0.8, 0.5, alturaGabinete);
         glutSolidCube(1.0);
@@ -63,21 +62,15 @@ void desenharLedCPU() {
     }
 
     glPushMatrix();
-        float alturaMesa = 1.0;
-        float alturaGabinete = 0.7;
-
-        // Posição: parte frontal superior direita do gabinete
         glTranslatef(0.35, 1.4, alturaMesa + 0.6);
-
-        // Deixa o cubo bem achatado para parecer um LED retangular
-        glScalef(0.15, 0.01, 0.03);  // Largura, altura, profundidade
+        glScalef(0.15, 0.01, 0.03);
         glutSolidCube(1.0);
     glPopMatrix();
 }
 
 
 void desenharMonitor() {
-    // Cor da tela
+    // Tela
     glColor3f(0.0f, 0.0f, 0.0f);
     glPushMatrix();
         glTranslatef(0.0, 0.0, 1.55);
@@ -85,7 +78,7 @@ void desenharMonitor() {
         glutSolidCube(1.0);
     glPopMatrix();
 
-    // Cor do suporte
+    // Suporte
     glColor3f(0.3f, 0.3f, 0.3f);
     glPushMatrix();
         glTranslatef(-0.08, 0.0, 1.3);
@@ -95,11 +88,8 @@ void desenharMonitor() {
 }
 
 void desenharTeclado() {
-    // Cor do teclado
     glColor3f(0.7f, 0.7f, 0.7f);
     glPushMatrix();
-        // Centralizado no eixo X, perto da borda da frente da mesa (Z positivo maior)
-        // Dimensões mais finas para parecer teclado
         glTranslatef(0.7, 0, 1.1); 
         glScalef(0.4, 0.8, 0.05);
         glutSolidCube(1.0);
@@ -107,24 +97,19 @@ void desenharTeclado() {
 }
 
 void desenharMouse() {
-    // Cor do mouse (cinza escuro)
     glColor3f(0.3f, 0.3f, 0.3f);
     glPushMatrix();
-        // Um pouco para a direita do teclado
         glTranslatef(0.75, 0.6, 1.1);
-        glScalef(0.1, 0.15, 0.1);
+        glScalef(0.15, 0.1, 0.1);
         glutSolidCube(1.0);
     glPopMatrix();
 }
 
 void timer(int value) {
-    // Alterna o estado do LED
     ledAceso = !ledAceso;
-
-    // Pede para a tela ser redesenhada
     glutPostRedisplay();
 
-    // Reagenda o timer para chamar essa função novamente em 1000 ms
+    // Reagenda o timer
     glutTimerFunc(1000, timer, 0);
 }
 
