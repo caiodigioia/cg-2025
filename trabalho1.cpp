@@ -2,6 +2,8 @@
 #include <iostream>
 GLfloat angle, fAspect, largura, altura, xcamera, ycamera, zcamera;
 GLfloat ajusteMonitor = 0;
+bool ledAceso = true;
+
 void desenharMesa() {
     // Cor do tampo da mesa
     glColor3f(0.6f, 0.3f, 0.0f);
@@ -53,6 +55,27 @@ void desenharCPU() {
     glPopMatrix();
 }
 
+void desenharLedCPU() {
+    if (ledAceso) {
+        glColor3f(0.0f, 1.0f, 0.0f);  // Verde aceso
+    } else {
+        glColor3f(0.0f, 0.2f, 0.0f);  // Verde apagado
+    }
+
+    glPushMatrix();
+        float alturaMesa = 1.0;
+        float alturaGabinete = 0.7;
+
+        // Posição: parte frontal superior direita do gabinete
+        glTranslatef(0.35, 1.4, alturaMesa + 0.6);
+
+        // Deixa o cubo bem achatado para parecer um LED retangular
+        glScalef(0.15, 0.01, 0.03);  // Largura, altura, profundidade
+        glutSolidCube(1.0);
+    glPopMatrix();
+}
+
+
 void desenharMonitor() {
     // Cor da tela
     glColor3f(0.0f, 0.0f, 0.0f);
@@ -94,6 +117,17 @@ void desenharMouse() {
     glPopMatrix();
 }
 
+void timer(int value) {
+    // Alterna o estado do LED
+    ledAceso = !ledAceso;
+
+    // Pede para a tela ser redesenhada
+    glutPostRedisplay();
+
+    // Reagenda o timer para chamar essa função novamente em 1000 ms
+    glutTimerFunc(1000, timer, 0);
+}
+
 void Desenha() {
 
 	//glClear(GL_COLOR_BUFFER_BIT);
@@ -106,6 +140,7 @@ void Desenha() {
 
     desenharMesa();
     desenharCPU();
+    desenharLedCPU();
     desenharMonitor();
     desenharTeclado();
     desenharMouse();
@@ -262,6 +297,7 @@ int main(int argc, char** argv) {
     glutSpecialFunc(TeclasEspeciais);
 
     Inicializa();
+    glutTimerFunc(1000, timer, 0);
     glutMainLoop();
 
     return 0;
