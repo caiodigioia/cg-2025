@@ -1,4 +1,4 @@
-#include <GLUT/glut.h>
+#include <GL/glut.h>
 #include <iostream>
 GLfloat angle, fAspect, largura, altura, xcamera, ycamera, zcamera;
 GLfloat ajusteMonitor = 0;
@@ -45,7 +45,7 @@ void desenharMesa() {
     glPopMatrix();
 }
 
-void desenharCPU() {
+void desenharGabinete() {
     glColor3f(0.2f, 0.2f, 0.2f);
     glPushMatrix();
         glTranslatef(0.0, 1.2, alturaMesa + alturaGabinete / 2.0); 
@@ -54,7 +54,7 @@ void desenharCPU() {
     glPopMatrix();
 }
 
-void desenharLedCPU() {
+void desenharLedGabinete() {
     if (ledAceso) {
         glColor3f(0.0f, 1.0f, 0.0f);  // Verde aceso
     } else {
@@ -124,8 +124,8 @@ void Desenha() {
               0.0, 0.0, 1.0);
 
     desenharMesa();
-    desenharCPU();
-    desenharLedCPU();
+    desenharGabinete();
+    desenharLedGabinete();
     desenharMonitor();
     desenharTeclado();
     desenharMouse();
@@ -273,7 +273,7 @@ int main(int argc, char** argv) {
     zcamera = 2;
     
     angle = 45;
-    glutCreateWindow("Cena 3D - Mesa, CPU, Monitor, Teclado e Mouse");
+    glutCreateWindow("Cena 3D - Mesa, Gabinete, Monitor, Teclado e Mouse");
 
     glutDisplayFunc(Desenha);
     glutReshapeFunc(AlteraTamanhoJanela);
