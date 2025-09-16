@@ -1,10 +1,21 @@
-#include <GL/glut.h>
+#include <GLUT/glut.h>
 #include <iostream>
+#include <cmath>
 GLfloat angle, fAspect, largura, altura, xcamera, ycamera, zcamera;
 GLfloat ajusteMonitor = 0;
 bool ledAceso = true;
 GLfloat alturaMesa = 1.0;
 GLfloat alturaGabinete = 0.7;
+GLfloat posicaoBolaX = 0.0;
+GLfloat posicaoBolaY = -1.3;
+
+// Bola
+GLfloat rotacaoBola = 0.0;
+GLfloat anguloTrajetoria = 0.0;   
+GLfloat raioCirculo = 0.8;        
+GLfloat velocidadeAngular = 0.05; 
+GLfloat centroX = 0.1;
+GLfloat centroY = 0.0;
 
 void desenharMesa() {
     // Tampo da mesa
@@ -44,6 +55,30 @@ void desenharMesa() {
         glutSolidCube(1.0);
     glPopMatrix();
 }
+
+void desenharBola() {
+    // Normaliza a rotação (0°–360°) para 0–1
+    float t = fmod(rotacaoBola, 360.0f) / 360.0;
+
+    // Fator de velocidade da cor (quanto maior, mais lento)
+    float speed = 0.2;
+
+    float r = fabs(sin(t * M_PI * 2 * speed));
+    float g = fabs(sin(t * M_PI * 2 * speed + 2.0));
+    float b = fabs(sin(t * M_PI * 2 * speed + 4.0));
+
+    glColor3f(r, g, b); // cor muda conforme a rotação
+
+    glPushMatrix();
+        // posição sobre a mesa
+        glTranslatef(posicaoBolaX, posicaoBolaY, alturaMesa + 0.16); 
+        
+        // rotação em torno do eixo Y (como se estivesse rolando no eixo X)
+        glRotatef(rotacaoBola, 0, 1, 0);          
+        glutSolidSphere(0.06, 30, 30);             
+    glPopMatrix();
+}
+
 
 void desenharGabinete() {
     glColor3f(0.2f, 0.2f, 0.2f);
@@ -90,7 +125,7 @@ void desenharMonitor() {
 void desenharTeclado() {
     glColor3f(0.7f, 0.7f, 0.7f);
     glPushMatrix();
-        glTranslatef(0.7, 0, 1.1); 
+        glTranslatef(0.5, 0, 1.1); 
         glScalef(0.4, 0.8, 0.05);
         glutSolidCube(1.0);
     glPopMatrix();
@@ -99,19 +134,38 @@ void desenharTeclado() {
 void desenharMouse() {
     glColor3f(0.3f, 0.3f, 0.3f);
     glPushMatrix();
-        glTranslatef(0.75, 0.6, 1.1);
+        glTranslatef(0.5, 0.5, 1.1);
         glScalef(0.15, 0.1, 0.1);
         glutSolidCube(1.0);
     glPopMatrix();
 }
 
-void timer(int value) {
+void timerBola(int value) {
+    // atualiza ângulo da trajetória
+    anguloTrajetoria += velocidadeAngular;
+    if (anguloTrajetoria > 360.0f) anguloTrajetoria -= 360.0f;
+
+    // posição da bola em círculo
+    posicaoBolaX = centroX + raioCirculo * cos(anguloTrajetoria);
+    posicaoBolaY = centroY + raioCirculo * sin(anguloTrajetoria);
+
+    // rotação da bola em si (rolando)
+    rotacaoBola += 10.0;
+    if (rotacaoBola > 360.0) rotacaoBola -= 360.0;
+
+    glutPostRedisplay();
+    glutTimerFunc(30, timerBola, 0); // ~33 fps
+}
+
+void timerLed(int value) {
     ledAceso = !ledAceso;
     glutPostRedisplay();
 
     // Reagenda o timer
-    glutTimerFunc(1000, timer, 0);
+    glutTimerFunc(1000, timerLed, 0);
 }
+
+
 
 void Desenha() {
 
@@ -124,6 +178,7 @@ void Desenha() {
               0.0, 0.0, 1.0);
 
     desenharMesa();
+    desenharBola();
     desenharGabinete();
     desenharLedGabinete();
     desenharMonitor();
@@ -282,7 +337,8 @@ int main(int argc, char** argv) {
     glutSpecialFunc(TeclasEspeciais);
 
     Inicializa();
-    glutTimerFunc(1000, timer, 0);
+    glutTimerFunc(0, timerBola, 0);
+    glutTimerFunc(0, timerLed, 0);
     glutMainLoop();
 
     return 0;
