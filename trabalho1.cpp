@@ -12,9 +12,9 @@ GLfloat posicaoBolaY = -1.3;
 // Bola
 GLfloat rotacaoBola = 0.0;
 GLfloat anguloTrajetoria = 0.0;   
-GLfloat raioCirculo = 0.8;        
+GLfloat raioCirculo = 0.87;        
 GLfloat velocidadeAngular = 0.05; 
-GLfloat centroX = 0.1;
+GLfloat centroX = 0.05;
 GLfloat centroY = 0.0;
 
 void desenharMesa() {
@@ -60,7 +60,7 @@ void desenharBola() {
     // Normaliza a rotação (0°–360°) para 0–1
     float t = fmod(rotacaoBola, 360.0f) / 360.0;
 
-    // Fator de velocidade da cor (quanto maior, mais lento)
+    // Fator de velocidade da cor
     float speed = 0.2;
 
     float r = fabs(sin(t * M_PI * 2 * speed));
@@ -73,7 +73,7 @@ void desenharBola() {
         // posição sobre a mesa
         glTranslatef(posicaoBolaX, posicaoBolaY, alturaMesa + 0.16); 
         
-        // rotação em torno do eixo Y (como se estivesse rolando no eixo X)
+        // rotação em torno do eixo Y
         glRotatef(rotacaoBola, 0, 1, 0);          
         glutSolidSphere(0.06, 30, 30);             
     glPopMatrix();
@@ -125,20 +125,30 @@ void desenharMonitor() {
 void desenharTeclado() {
     glColor3f(0.7f, 0.7f, 0.7f);
     glPushMatrix();
-        glTranslatef(0.5, 0, 1.1); 
+        glTranslatef(0.45, -0.05, 1.1); 
         glScalef(0.4, 0.8, 0.05);
         glutSolidCube(1.0);
     glPopMatrix();
 }
 
 void desenharMouse() {
+    // Base arredondada do mouse
     glColor3f(0.3f, 0.3f, 0.3f);
     glPushMatrix();
-        glTranslatef(0.5, 0.5, 1.1);
-        glScalef(0.15, 0.1, 0.1);
-        glutSolidCube(1.0);
+        glTranslatef(0.45, 0.50, 1.1);
+        glScalef(0.15f, 0.1f, 0.05f); // achatar
+        glutSolidSphere(1.0, 30, 30);
+    glPopMatrix();
+
+    // Scroll do mouse
+    glColor3f(0.2f, 0.2f, 0.2f);
+    glPushMatrix();
+        glTranslatef(0.35, 0.50, 1.13);
+        glutSolidSphere(0.015, 20, 20);
     glPopMatrix();
 }
+
+
 
 void timerBola(int value) {
     // atualiza ângulo da trajetória
