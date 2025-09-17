@@ -6,11 +6,12 @@ GLfloat ajusteMonitor = 0;
 bool ledAceso = true;
 GLfloat alturaMesa = 1.0;
 GLfloat alturaGabinete = 0.7;
+
+// Bola - posição
 GLfloat posicaoBolaX = 0.0;
 GLfloat posicaoBolaY = -1.3;
 
-// Bola
-GLfloat rotacaoBola = 0.0;
+// Bola - animação
 GLfloat anguloTrajetoria = 0.0;   
 GLfloat raioCirculo = 0.87;        
 GLfloat velocidadeAngular = 0.05; 
@@ -57,28 +58,17 @@ void desenharMesa() {
 }
 
 void desenharBola() {
-    // Normaliza a rotação (0°–360°) para 0–1
-    float t = fmod(rotacaoBola, 360.0f) / 360.0;
-
-    // Fator de velocidade da cor
-    float speed = 0.2;
-
-    float r = fabs(sin(t * M_PI * 2 * speed));
-    float g = fabs(sin(t * M_PI * 2 * speed + 2.0));
-    float b = fabs(sin(t * M_PI * 2 * speed + 4.0));
-
-    glColor3f(r, g, b); // cor muda conforme a rotação
+    float t = fmod(anguloTrajetoria * 20, 360.0f) / 360.0f; 
+    float r = fabs(sin(t * M_PI * 2));
+    float g = fabs(sin(t * M_PI * 2 + 2.0));
+    float b = fabs(sin(t * M_PI * 2 + 4.0));
+    glColor3f(r, g, b);
 
     glPushMatrix();
-        // posição sobre a mesa
         glTranslatef(posicaoBolaX, posicaoBolaY, alturaMesa + 0.16); 
-        
-        // rotação em torno do eixo Y
-        glRotatef(rotacaoBola, 0, 1, 0);          
         glutSolidSphere(0.06, 30, 30);             
     glPopMatrix();
 }
-
 
 void desenharGabinete() {
     glColor3f(0.2f, 0.2f, 0.2f);
@@ -153,18 +143,13 @@ void desenharMouse() {
 void timerBola(int value) {
     // atualiza ângulo da trajetória
     anguloTrajetoria += velocidadeAngular;
-    if (anguloTrajetoria > 360.0f) anguloTrajetoria -= 360.0f;
 
     // posição da bola em círculo
     posicaoBolaX = centroX + raioCirculo * cos(anguloTrajetoria);
     posicaoBolaY = centroY + raioCirculo * sin(anguloTrajetoria);
 
-    // rotação da bola em si (rolando)
-    rotacaoBola += 10.0;
-    if (rotacaoBola > 360.0) rotacaoBola -= 360.0;
-
     glutPostRedisplay();
-    glutTimerFunc(30, timerBola, 0); // ~33 fps
+    glutTimerFunc(30, timerBola, 0);
 }
 
 void timerLed(int value) {
