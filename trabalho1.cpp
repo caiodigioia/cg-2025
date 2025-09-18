@@ -367,10 +367,10 @@ void GerenciaTeclado(unsigned char key, int x, int y) {
 void GerenciaMouse(int button, int state, int x, int y)
 {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
-        if(!alvoFixo) {}//TODO
+        if(!alvoFixo) yalvo -= 0.5;
 	}
 	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN){
-        if(!alvoFixo) {}//TODO
+        if(!alvoFixo) yalvo += 0.5;
 	}
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);   //aplica o zBuffer  
     EspecificaParametrosVisualizacao();
