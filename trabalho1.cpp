@@ -1,22 +1,23 @@
-#include <GLUT/glut.h>
+#include <GL/glut.h>
 #include <iostream>
 #include <cmath>
-GLfloat angle, fAspect, largura, altura, xcamera, ycamera, zcamera;
+
+GLfloat angle, fAspect, largura, altura, xcamera, ycamera, zcamera, xalvo, yalvo, zalvo;
 GLfloat ajusteMonitor = 0;
 bool ledAceso = true;
 GLfloat alturaMesa = 1.0;
 GLfloat alturaGabinete = 0.7;
-
-// Bola - posição
 GLfloat posicaoBolaX = 0.0;
 GLfloat posicaoBolaY = -1.3;
 
-// Bola - animação
+// Bola
 GLfloat anguloTrajetoria = 0.0;   
 GLfloat raioCirculo = 0.87;        
 GLfloat velocidadeAngular = 0.05; 
 GLfloat centroX = 0.05;
 GLfloat centroY = 0.0;
+
+bool alvoFixo = true;
 
 void desenharMesa() {
     // Tampo da mesa
@@ -58,17 +59,20 @@ void desenharMesa() {
 }
 
 void desenharBola() {
+
     float t = fmod(anguloTrajetoria * 20, 360.0f) / 360.0f; 
     float r = fabs(sin(t * M_PI * 2));
     float g = fabs(sin(t * M_PI * 2 + 2.0));
     float b = fabs(sin(t * M_PI * 2 + 4.0));
-    glColor3f(r, g, b);
 
+    glColor3f(r, g, b);
     glPushMatrix();
-        glTranslatef(posicaoBolaX, posicaoBolaY, alturaMesa + 0.16); 
+        // posição sobre a mesa
+        glTranslatef(posicaoBolaX, posicaoBolaY, alturaMesa + 0.16);         
         glutSolidSphere(0.06, 30, 30);             
     glPopMatrix();
 }
+
 
 void desenharGabinete() {
     glColor3f(0.2f, 0.2f, 0.2f);
@@ -138,8 +142,6 @@ void desenharMouse() {
     glPopMatrix();
 }
 
-
-
 void timerBola(int value) {
     // atualiza ângulo da trajetória
     anguloTrajetoria += velocidadeAngular;
@@ -147,6 +149,7 @@ void timerBola(int value) {
     // posição da bola em círculo
     posicaoBolaX = centroX + raioCirculo * cos(anguloTrajetoria);
     posicaoBolaY = centroY + raioCirculo * sin(anguloTrajetoria);
+
 
     glutPostRedisplay();
     glutTimerFunc(30, timerBola, 0);
@@ -160,7 +163,39 @@ void timerLed(int value) {
     glutTimerFunc(1000, timerLed, 0);
 }
 
+void desenharLuminaria() {
+    // Base da luminária
+    glColor3f(0.3f, 0.3f, 0.3f); 
+    glPushMatrix();
+        glTranslatef(0.5, -1.2, alturaMesa + 0.1); // posição na esquerda da mesa
+        glScalef(0.4, 0.4, 0.05); // achatada no Z
+        glutSolidCube(1.0);
+    glPopMatrix();
 
+    // Haste
+    glColor3f(0.2f, 0.2f, 0.2f); 
+    glPushMatrix();
+        glTranslatef(0.4, -1.2, alturaMesa + 0.5); 
+        glRotatef(-30, 0, 1, 0); // inclinada
+        glScalef(0.05, 0.05, 1.0);
+        glutSolidCube(1.0);
+    glPopMatrix();
+
+    // Cúpula (abajur)
+    glColor3f(0.9f, 0.9f, 0.0f); // amarelo claro
+    glPushMatrix();
+        glTranslatef(0.20, -0.8, alturaMesa + 0.9);
+        glRotatef(90, 1, 0, 0);
+        glutSolidCone(0.25, 0.4, 20, 20);
+    glPopMatrix();
+
+    // "Luz" da lâmpada (esfera dentro do cone)
+    glColor3f(1.0f, 1.0f, 0.6f); 
+    glPushMatrix();
+        glTranslatef(0.25, -0.8, alturaMesa + 0.9);
+        glutSolidSphere(0.08, 20, 20);
+    glPopMatrix();
+}
 
 void Desenha() {
 
@@ -169,7 +204,7 @@ void Desenha() {
     glLoadIdentity();
 
     gluLookAt(xcamera, ycamera, zcamera,
-              0.0, 0.0, 1.0,
+              xalvo, yalvo, zalvo,
               0.0, 0.0, 1.0);
 
     desenharMesa();
@@ -179,13 +214,37 @@ void Desenha() {
     desenharMonitor();
     desenharTeclado();
     desenharMouse();
+    desenharLuminaria();
 
     glutSwapBuffers();
 }
 
 void Inicializa(void) {
 
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f); 
+    GLfloat luzambiente[4] = {0.3, 0.3, 0.3, 1.0};
+    GLfloat luzDifusa[4] = {0.1, 0.1, 0.1, 1.0};
+    GLfloat luzEspecular[4] = {0.5, 0.5, 0.5, 1.0};
+    GLfloat posicaoLuz[4] = {0.25, -0.7, 1.9, 1.0};
+
+    GLint expoenteEspecular = 100;
+    GLfloat emissao[4] = {0.1, 0.1, 0.1, 1.0};
+
+    glClearColor(0.7f, 0.7f, 0.7f, 0.7f); 
+
+    glShadeModel(GL_SMOOTH);
+    glMateriali(GL_FRONT, GL_SHININESS, expoenteEspecular);
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzambiente);
+
+    glMaterialfv(GL_FRONT, GL_EMISSION, emissao);
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, luzambiente);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, luzEspecular);
+    glLightfv(GL_LIGHT0, GL_POSITION, posicaoLuz);
+
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
 
     glEnable(GL_DEPTH_TEST);   //ativa o zBuffer
 
@@ -209,7 +268,7 @@ void EspecificaParametrosVisualizacao(void)
 
 	// Especifica posição do observador e do alvo
 	gluLookAt(xcamera, ycamera, zcamera,  // posição da câmera
-              0, 0, 0,          // posição do alvo
+              xalvo, yalvo, zalvo,          // posição do alvo
               0, 1, 0);         // vetor UP da câmera
 }
 
@@ -233,18 +292,12 @@ void TeclasEspeciais(int key, int x, int y)
 {
 	if (key == GLUT_KEY_UP) {
 		zcamera += 0.5;  
+        if(!alvoFixo) zalvo += 0.5;
 	}
 	if (key == GLUT_KEY_DOWN) {
 		zcamera -= 0.5;  
+        if(!alvoFixo) zalvo -= 0.5;
 	}
-	/*
-	if (key == GLUT_KEY_RIGHT) {
-		 
-	}
-	if (key == GLUT_KEY_LEFT) {
-		  
-	}
-	*/
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);   //aplica o zBuffer  
     EspecificaParametrosVisualizacao();
 	glutPostRedisplay();
@@ -257,22 +310,29 @@ void GerenciaTeclado(unsigned char key, int x, int y) {
             xcamera = 10;
             ycamera = 2;
 			zcamera = 2;
+            xalvo = 0;
+            yalvo = 0;
+            zalvo = 1;
 			break;
 		case 'w':
         case 'W':
-            xcamera += -0.5;
+            xcamera -= 0.5;
+            if(!alvoFixo) xalvo -= 0.5;
             break;
         case 's':
         case 'S':
-            xcamera -= -0.5;
+            xcamera += 0.5;
+            if(!alvoFixo) xalvo += 0.5;
             break;
         case 'a':
         case 'A':
             ycamera -= 0.5;
+            if(!alvoFixo) yalvo -= 0.5;
             break;
         case 'd':
         case 'D':
             ycamera += 0.5;
+            if(!alvoFixo) yalvo += 0.5;
             break;
 
         // monitor
@@ -287,6 +347,16 @@ void GerenciaTeclado(unsigned char key, int x, int y) {
                 ajusteMonitor -= 0.1;
             }
             break;
+        case 'b':
+        case 'B':
+            alvoFixo = !alvoFixo;
+            xcamera = 10;
+            ycamera = 2;
+			zcamera = 2;
+            xalvo = 0;
+            yalvo = 0;
+            zalvo = 1;
+            break;
 	}
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);   //aplica o zBuffer  
@@ -297,10 +367,10 @@ void GerenciaTeclado(unsigned char key, int x, int y) {
 void GerenciaMouse(int button, int state, int x, int y)
 {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
-	
+        if(!alvoFixo) {}//TODO
 	}
 	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN){
-	
+        if(!alvoFixo) {}//TODO
 	}
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);   //aplica o zBuffer  
     EspecificaParametrosVisualizacao();
@@ -321,6 +391,10 @@ int main(int argc, char** argv) {
     xcamera = 10;
     ycamera = 2;
     zcamera = 2;
+
+    xalvo = 0;
+    yalvo = 0;
+    zalvo = 1;
     
     angle = 45;
     glutCreateWindow("Cena 3D - Mesa, Gabinete, Monitor, Teclado e Mouse");
